@@ -25,6 +25,7 @@ const app = express();
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
+app.use(express.json());
 
 // By default, the client will authenticate using the service account file
 // specified by the GOOGLE_APPLICATION_CREDENTIALS environment variable and use
@@ -47,11 +48,17 @@ function insertSignature (signature) {
 	getCount()
 	.then((count) => {
 		signature.count = count ? count + 1 : 1;
-	  	datastore.insert({
-			key: signatureKey,
-			data: signature,
-		});
-		return signature;
+		try {
+		  	datastore.insert({
+				key: signatureKey,
+				data: signature,
+			});
+			return signature;
+		} catch(error) {
+			console.error(error);
+			return false;
+		}
+
 	});
 }
 
@@ -73,8 +80,9 @@ app.get('/count', (req, res, next) => {
     .catch(next);
 });
 
-app.post('/submit', (req, res) => {
+app.post('/submit', (req, res, next) => {
   // Create a signature record to be stored in the database
+  console.log(req.body);
   const signature = {
   	timestamp: new Date(),
     // Store a hash of the visitor's ip address
@@ -88,7 +96,7 @@ app.post('/submit', (req, res) => {
   };
   
   res.send(insertSignature(signature));
-  
+  next();
 });
 
 const PORT = process.env.PORT || 8080;
