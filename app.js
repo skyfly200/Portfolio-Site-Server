@@ -53,12 +53,9 @@ function insertSignature (signature) {
 				key: signatureKey,
 				data: signature,
 			});
-			return signature;
 		} catch(error) {
 			console.error(error);
-			return false;
 		}
-
 	});
 }
 
@@ -68,7 +65,12 @@ function getCount () {
   return datastore.runQuery(query)
     .then((results) => {
       const entities = results[0];
-      return entities[0].count;
+      if (entities[0].count) return entities[0].count;
+      return 0;
+    })
+    .catch((error) => {
+    	console.error(error);
+    	return 0;
     });
 }
 
@@ -88,13 +90,16 @@ app.post('/submit', (req, res, next) => {
     userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7),
     firstName: req.body.firstName,
     lastName: req.body.lastName,
+    email: req.body.email,
     city: req.body.city,
     state: req.body.state,
     zip: req.body.zip,
     message: req.body.message
   };
   
-  res.status(200).json(insertSignature(signature));
+  insertSignature(signature);
+  res.status(200).json(signature);
+  
   next();
 });
 
