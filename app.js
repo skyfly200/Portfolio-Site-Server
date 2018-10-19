@@ -82,7 +82,6 @@ app.get('/count', (req, res, next) => {
 
 app.post('/submit', (req, res, next) => {
   // Create a signature record to be stored in the database
-  console.log(req.body);
   const signature = {
   	timestamp: new Date(),
     // Store a hash of the visitor's ip address
@@ -95,7 +94,7 @@ app.post('/submit', (req, res, next) => {
     message: req.body.message
   };
   
-  res.send(insertSignature(signature));
+  res.status(200).json(insertSignature(signature));
   next();
 });
 
