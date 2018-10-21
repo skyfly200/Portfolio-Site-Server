@@ -37,8 +37,6 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
-const signatureKey = datastore.key('signature');
-
 /**
  * Insert a signature record into the database.
  *
@@ -48,14 +46,17 @@ function insertSignature (signature) {
 	getCount()
 	.then((count) => {
 		signature.count = count ? count + 1 : 1;
-		try {
-		  	datastore.insert({
-				key: signatureKey,
-				data: signature,
-			});
-		} catch(error) {
+	  	return datastore.insert({
+			key: datastore.key(['signature', signature.email]), // this may need to be set difrently to fix the error in GitHub issue #1
+			data: signature,
+		})
+		.then( (result) => {
+			return result;
+		})
+		.catch( (error) => {
 			console.error(error);
-		}
+			return error;
+		});
 	});
 }
 
@@ -65,7 +66,7 @@ function getCount () {
   return datastore.runQuery(query)
     .then((results) => {
       const entities = results[0];
-      if (entities[0].count) return entities[0].count;
+      if (entities[0] && entities[0].count) return entities[0].count;
       return 0;
     })
     .catch((error) => {
