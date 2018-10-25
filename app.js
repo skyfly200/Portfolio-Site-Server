@@ -1,18 +1,3 @@
-/**
- * Copyright 2017, Google, Inc.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 // [START gae_flex_datastore_app]
 'use strict';
 
@@ -37,78 +22,80 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
-/**
- * Insert a signature record into the database.
- *
- * @param {object} signature The signature record to insert.
- */
-function insertSignature (signature) {
-	getCount()
-	.then((count) => {
-		signature.count = count ? count + 1 : 1;
-	  	return datastore.insert({
-			key: datastore.key(['signature', signature.email]), // this may need to be set difrently to fix the error in GitHub issue #1
-			data: signature,
-		})
-		.then( (result) => {
-			return result;
-		})
-		.catch( (error) => {
-			console.error(error);
-			return error;
-		});
+// convert to async await
+async function insertSignature (req) {
+	let count = await getCount();
+	// Create a signature record to be stored in the database
+	const signature = {
+		timestamp: new Date(),
+	    // Store a hash of the visitor's ip address
+	    userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7),
+	    count: count + 1,
+	    firstName: req.body.firstName,
+	    lastName: req.body.lastName,
+	    email: req.body.email,
+	    city: req.body.city,
+	    state: req.body.state,
+	    zip: req.body.zip,
+	    message: req.body.message
+	};
+  	let result = await datastore.insert({
+		key: datastore.key(['signature', signature.email]),
+		data: signature,
 	});
+	return {
+		result: result,
+		entry: signature,
+	};
 }
 
-function getCount () {
-  const query = datastore.createQuery('signature').order('timestamp', { descending: true }).limit(1);
+async function getEmail (email) {
+	const query = datastore.createQuery('signature').filter('email',email);
+	let result = await datastore.runQuery(query);
+	return result[0];
+}
 
-  return datastore.runQuery(query)
-    .then((results) => {
-      const entities = results[0];
-      if (entities[0] && entities[0].count) return entities[0].count;
-      return 0;
-    })
-    .catch((error) => {
-    	console.error(error);
-    	return 0;
-    });
+
+async function getCount () {
+	const query = datastore.createQuery('signature').order('timestamp', { descending: true }).limit(1);
+	let results = await datastore.runQuery(query);
+    const entities = results[0];
+    if (entities[0] && entities[0].count) return entities[0].count;
+    return 0;
 }
 
 app.get('/count', (req, res, next) => {
 	getCount()
 	.then((count) => {
       res.status(200).json({count});
+      next();
     })
-    .catch(next);
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
 });
 
 app.post('/submit', (req, res, next) => {
-  // Create a signature record to be stored in the database
-  const signature = {
-  	timestamp: new Date(),
-    // Store a hash of the visitor's ip address
-    userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7),
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    city: req.body.city,
-    state: req.body.state,
-    zip: req.body.zip,
-    message: req.body.message
-  };
-  
-  insertSignature(signature);
-  res.status(200).json(signature);
-  
-  next();
+	insertSignature(req)
+	.then( (entry) => {
+		res.status(200).json(entry);
+  		next();
+	})
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.log(error);
+		next();
+	});
 });
 
 const PORT = process.env.PORT || 8080;
 app.listen(process.env.PORT || 8080, () => {
-  console.log(`App listening on port ${PORT}`);
-  console.log('Press Ctrl+C to quit.');
+	console.log(`App listening on port ${PORT}`);
+	console.log('Press Ctrl+C to quit.');
 });
+
 // [END gae_flex_datastore_app]
 
 module.exports = app;
