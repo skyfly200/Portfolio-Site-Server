@@ -30,7 +30,7 @@ async function insertPost (req) {
 	    title: req.body.title,
 	    body: req.body.body,
 	    tags: req.body.tags,
-			key: req.body.key
+			key: req.body.id
 	};
   let result = await datastore.insert({
 		key: datastore.key(['post', post.key]),
