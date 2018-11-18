@@ -57,17 +57,36 @@ async function tagLink (tag, post) {
 	});
 }
 
-async function getPost (key) {
-	const query = datastore.createQuery('post').filter('__key__', key);
+async function insertPost (req) {
+	// Create a post record to be stored in the database
+	const post = {
+			datetime: req.body.datetime,
+	    title: req.body.title,
+	    body: req.body.body,
+	    tags: req.body.tags,
+		id: req.body.id
+	};
+  let result = await datastore.insert({
+		key: datastore.key(['post', post.id]),
+		data: post,
+	});
+	for (let tag in post.tags) tagLink(tag, post.id);
+	return result;
+}
+
+async function getPost (id) {
+	const query = datastore.createQuery('post').filter('id', id);
 	let result = await datastore.runQuery(query);
-	return result[0];
+	const entities = result[0];
+    if (entities) return entities;
+    return 0;
 }
 
 async function getPostsByTag (tag) {
 	const transaction = datastore.transaction();
 	transaction.run((err) => {
 	  if (err) {}
-		const query = datastore.createQuery('tag').filter('__key__', tag)
+		const query = datastore.createQuery('tag').filter('__key__', tag);
 	  query.run((err, entities) => {
 	    if (err) {}
 			const request = {
@@ -103,6 +122,19 @@ app.get('/posts', (req, res, next) => {
 	getPosts()
 	.then((posts) => {
       res.status(200).json({posts});
+      next();
+    })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
+});
+
+app.get('/post/:id', (req, res, next) => {
+	getPost(req.params.id)
+	.then((post) => {
+      res.status(200).json({post});
       next();
     })
 	.catch( (error) => {
