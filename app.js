@@ -2,9 +2,11 @@
 'use strict';
 
 const express = require('express');
-const crypto = require('crypto');
 const bodyParser = require('body-parser');
 var cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const config = require('./config');
 
 const app = express();
 app.enable('trust proxy');
