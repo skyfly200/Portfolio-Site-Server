@@ -34,7 +34,7 @@ async function insertPost (req) {
 	    tags: req.body.tags,
 	    key: req.body.id
 	};
-  let result = await datastore.insert({
+  let result = await datastore.save({
 		key: datastore.key(['post', post.key]),
 		data: post,
 	});
@@ -59,7 +59,7 @@ async function tagLink (tag, post) {
 	});
 }
 
-async function insertPost (req) {
+async function savePost (req) {
 	// Create a post record to be stored in the database
 	const post = {
 			datetime: req.body.datetime,
@@ -76,11 +76,19 @@ async function insertPost (req) {
 	return result;
 }
 
+async function deletePost (id) {
+	const key = datastore.key(['id', id]);
+	datastore.delete(key, (err, response) => {
+		if (err) return false;
+		return response;
+	});
+}
+
 async function getPost (id) {
 	const query = datastore.createQuery('post').filter('id', id);
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
-  if (entities) return entities;
+  if (entities) return entities[0];
   return 0;
 }
 
@@ -146,8 +154,21 @@ app.get('/post/:id', (req, res, next) => {
 	});
 });
 
+app.delete('/post/:id', (req, res, next) => {
+	deletePost(req.params.id)
+	.then((post) => {
+      res.status(200).json({post});
+      next();
+    })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
+});
+
 app.post('/submit', (req, res, next) => {
-	insertPost(req)
+	savePost(req)
 	.then( (entry) => {
 		res.status(200).json(entry);
   		next();
