@@ -188,7 +188,7 @@ function sendAuth(req, res, next) {
 		next();
   })
 	.catch( (err) => {
-		res.status(500).send("There was a problem getting user");
+		res.status(500).send("There was a problem getting user: " + err);
 	});
 }
 
@@ -196,6 +196,7 @@ async function getUser(email) {
 	const query = datastore.createQuery('user').filter('email', email);
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
+	console.log(entities[0]);
   if (entities) return entities[0];
   return 0;
 }
