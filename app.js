@@ -181,7 +181,6 @@ function sendAuth(req, res, next) {
 	getUser(req.body.email)
 	.then( (user) => {
     if (!user) return res.status(404).send('No user found.');
-		console.log(user);
     let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
     let token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 }); // Expires in 24 hours
