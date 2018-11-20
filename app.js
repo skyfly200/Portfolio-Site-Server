@@ -173,7 +173,7 @@ function registerUser(req, res, next) {
 		if (err) return res.status(500).send("There was a problem registering the user.")
 		sendAuth(req, res, next);
 	});
-});
+}
 
 app.post('/register', registerUser);
 
