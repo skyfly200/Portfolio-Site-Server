@@ -165,7 +165,7 @@ function registerUser(req, res, next) {
 		data: {
 			name: req.body.name,
 			email: req.body.email,
-			pass: bcrypt.hashSync(req.body.password, 8),
+			password: bcrypt.hashSync(req.body.password, 8),
 			admin: 0
 		}
 	},
@@ -196,8 +196,9 @@ async function getUser(email) {
 	const query = datastore.createQuery('user').filter('email', email);
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
-    if (entities) return entities;
-    return 0;
+	console.log(result);
+  if (entities) return entities;
+  return 0;
 }
 
 app.post('/login', sendAuth);
