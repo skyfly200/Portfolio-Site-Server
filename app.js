@@ -166,7 +166,7 @@ function registerUser(req, res, next) {
 			name: req.body.name,
 			email: req.body.email,
 			pass: bcrypt.hashSync(req.body.password, 8),
-			is-admin: 0
+			admin: 0
 		}
 	},
 	(err) => {
