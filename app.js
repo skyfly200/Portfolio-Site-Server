@@ -196,8 +196,7 @@ async function getUser(email) {
 	const query = datastore.createQuery('user').filter('email', email);
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
-	console.log(result[0]);
-  if (entities) return entities;
+  if (entities) return entities[0];
   return 0;
 }
 
