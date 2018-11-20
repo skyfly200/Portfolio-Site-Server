@@ -3,6 +3,15 @@
 This sample application shows how to use Google Cloud Datastore on Google App
 Engine.
 
+Be sure to add a config.js file like so
+
+```javascript
+module.exports = {
+    'secret': 'supersecretstring'
+};
+```
+
+
 [App Engine standard environment][appengine-std] users: See tutorial [Using Cloud Datastore][tutorial-std] for more information on running and deploying this app.
 
 [App Engine flexible environment][appengine-flex] users: See tutorial [Using Cloud Datastore][tutorial-flex] for more information on running and deploying this app.
