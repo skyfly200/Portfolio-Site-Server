@@ -161,7 +161,7 @@ app.delete('/post/:id', (req, res, next) => {
       next();
     })
 	.catch( (error) => {
-		res.status(204).json(error);
+		res.status(204).json({error: error});
 		console.error(error);
 		next();
 	});
