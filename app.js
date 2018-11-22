@@ -81,7 +81,7 @@ function deletePost (id) {
 	return new Promise( function(resolve, reject) {
 		datastore.delete(key, (err, response) => {
 			if (err) reject(false);
-			resolve(response);
+			else resolve(response);
 		});
 	});
 }
