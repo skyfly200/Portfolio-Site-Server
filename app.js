@@ -76,7 +76,7 @@ async function savePost (req) {
 	return result;
 }
 
-async function deletePost (id) {
+function deletePost (id) {
 	const key = datastore.key(['id', id]);
 	datastore.delete(key, (err, response) => {
 		if (err) return false;
