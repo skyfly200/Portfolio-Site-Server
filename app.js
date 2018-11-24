@@ -24,24 +24,6 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
-// convert to async await
-async function insertPost (req) {
-	// Create a post record to be stored in the database
-	const post = {
-			datetime: req.body.datetime,
-	    title: req.body.title,
-	    body: req.body.body,
-	    tags: req.body.tags,
-	    key: req.body.id
-	};
-  let result = await datastore.save({
-		key: datastore.key(['post', post.key]),
-		data: post,
-	});
-	for (tag in post.tags) tagLink(tag, post.key);
-	return result;
-}
-
 async function tagLink (tag, post) {
 	const transaction = datastore.transaction();
 	transaction.run((err) => {
@@ -59,7 +41,7 @@ async function tagLink (tag, post) {
 	});
 }
 
-async function savePost (req) {
+async function savePost(req) {
 	// Create a post record to be stored in the database
 	const post = {
 			datetime: req.body.datetime,
@@ -68,7 +50,7 @@ async function savePost (req) {
 	    tags: req.body.tags,
 		id: req.body.id
 	};
-  let result = await datastore.insert({
+  let result = await datastore.save({
 		key: datastore.key(['post', post.id]),
 		data: post,
 	});
