@@ -78,7 +78,7 @@ async function savePost(req) {
 	const post = {
 		id: req.body.id,
 		created: req.body.created,
-		updated: req.body.updated,
+		edited: req.body.edited,
     title: req.body.title,
     body: req.body.body,
     tags: req.body.tags,
