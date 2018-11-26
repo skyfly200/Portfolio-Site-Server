@@ -74,13 +74,15 @@ async function getPostsByTag (tag) {
 // Post Functions
 
 async function savePost(req) {
-	// Create a post record to be stored in the database
+	// Create a new post record to be stored in the database
 	const post = {
-			datetime: req.body.datetime,
-	    title: req.body.title,
-	    body: req.body.body,
-	    tags: req.body.tags,
-		id: req.body.id
+		id: req.body.id,
+		created: req.body.created,
+		updated: req.body.updated,
+    title: req.body.title,
+    body: req.body.body,
+    tags: req.body.tags,
+		edits: req.body.edits
 	};
   let result = await datastore.save({
 		key: datastore.key(['post', post.id]),
@@ -109,7 +111,7 @@ async function getPost (id) {
 }
 
 async function getPosts () {
-	const query = datastore.createQuery('post').order('datetime', { descending: true });
+	const query = datastore.createQuery('post').order('created', { descending: true });
 	let results = await datastore.runQuery(query);
     const entities = results[0];
     if (entities) return entities;
@@ -130,16 +132,18 @@ app.get('/posts', (req, res, next) => {
 });
 
 app.get('/post/:id', (req, res, next) => {
-	getPost(req.params.id)
-	.then((post) => {
-      res.status(200).json({post});
-      next();
-    })
-	.catch( (error) => {
-		res.status(204).json(error);
-		console.error(error);
-		next();
-	});
+	if (req.params.id) {
+		getPost(req.params.id)
+		.then((post) => {
+	      res.status(200).json({post});
+	      next();
+	    })
+		.catch( (error) => {
+			res.status(204).json(error);
+			console.error(error);
+			next();
+		});
+	}
 });
 
 app.delete('/post/:id', (req, res, next) => {
