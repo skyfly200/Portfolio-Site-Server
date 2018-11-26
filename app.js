@@ -24,6 +24,8 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
+// Tag Functions
+
 async function tagLink (tag, post) {
 	const transaction = datastore.transaction();
 	transaction.run((err) => {
@@ -40,6 +42,36 @@ async function tagLink (tag, post) {
 	  });
 	});
 }
+
+async function getPostsByTag (tag) {
+	const transaction = datastore.transaction();
+	transaction.run((err) => {
+	  if (err) {}
+		const query = datastore.createQuery('tag').filter('__key__', tag);
+	  query.run((err, entities) => {
+	    if (err) {}
+			const request = {
+			  projectId: '',
+			  keys: entities,
+			};
+			transaction.lookup(request)
+			  .then(responses => {
+			    const response = responses[0];
+			    return response;
+			  })
+			  .catch(err => {
+			    console.error(err);
+			  });
+	    transaction.commit((err) => {
+	      if (!err) {
+	        // Transaction committed successfully.
+	      }
+	    });
+	  });
+	});
+}
+
+// Post Functions
 
 async function savePost(req) {
 	// Create a post record to be stored in the database
@@ -74,34 +106,6 @@ async function getPost (id) {
 	const entities = result[0];
   if (entities) return entities[0];
   return 0;
-}
-
-async function getPostsByTag (tag) {
-	const transaction = datastore.transaction();
-	transaction.run((err) => {
-	  if (err) {}
-		const query = datastore.createQuery('tag').filter('__key__', tag);
-	  query.run((err, entities) => {
-	    if (err) {}
-			const request = {
-			  projectId: '',
-			  keys: entities,
-			};
-			transaction.lookup(request)
-			  .then(responses => {
-			    const response = responses[0];
-			    return response;
-			  })
-			  .catch(err => {
-			    console.error(err);
-			  });
-	    transaction.commit((err) => {
-	      if (!err) {
-	        // Transaction committed successfully.
-	      }
-	    });
-	  });
-	});
 }
 
 async function getPosts () {
@@ -164,6 +168,8 @@ app.post('/submit', (req, res, next) => {
 	});
 });
 
+// Auth Functions
+
 function registerUser(req, res, next) {
 	datastore.insert({
 		key: datastore.key(['user', req.body.email]),
@@ -206,6 +212,8 @@ async function getUser(email) {
 }
 
 app.post('/login', sendAuth);
+
+// Start Server
 
 const PORT = process.env.PORT || 8080;
 app.listen(process.env.PORT || 8080, () => {
