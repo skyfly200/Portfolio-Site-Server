@@ -111,7 +111,7 @@ async function getPost (id) {
 }
 
 async function getPosts () {
-	const query = datastore.createQuery('post').order('created', { descending: true });
+	const query = datastore.createQuery('post').order('created', { descending: false });
 	let results = await datastore.runQuery(query);
     const entities = results[0];
     if (entities) return entities;
