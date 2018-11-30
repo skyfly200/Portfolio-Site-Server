@@ -43,6 +43,8 @@ async function tagLink (tag, post) {
 	});
 }
 
+// Post Functions
+
 async function getPostsByTag (tag) {
 	const transaction = datastore.transaction();
 	transaction.run((err) => {
@@ -70,8 +72,6 @@ async function getPostsByTag (tag) {
 	  });
 	});
 }
-
-// Post Functions
 
 async function savePost(req) {
 	// Create a new post record to be stored in the database
@@ -129,6 +129,21 @@ app.get('/posts', (req, res, next) => {
 		console.error(error);
 		next();
 	});
+});
+
+app.get('/posts/:tag', (req, res, next) => {
+	if (req.params.tag) {
+		getPostsByTag(req.params.tag)
+		.then((posts) => {
+	      res.status(200).json({posts});
+	      next();
+	    })
+		.catch( (error) => {
+			res.status(204).json(error);
+			console.error(error);
+			next();
+		});
+	}
 });
 
 app.get('/post/:id', (req, res, next) => {
