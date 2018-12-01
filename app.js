@@ -193,9 +193,12 @@ function registerUser(req, res, next) {
 	datastore.insert({
 		key: datastore.key(['user', req.body.email]),
 		data: {
-			name: req.body.name,
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			username: req.body.username,
 			email: req.body.email,
 			password: bcrypt.hashSync(req.body.password, 8),
+			subscribe: req.body.subscribe,
 			admin: 0
 		}
 	},
