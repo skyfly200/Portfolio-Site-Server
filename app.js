@@ -34,7 +34,7 @@ async function tagLink (tag, post) {
 	  transaction.get(key, (err, entity) => {
 	    if (err) {}
 			let update = entity ? entity : [];
-	    update.posts.append(post);
+	    update.posts.push(post);
 	    transaction.save(entity);
 	    transaction.commit((err) => {
 	      if (!err) {}
