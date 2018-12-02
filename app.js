@@ -1,6 +1,8 @@
 // [START gae_flex_datastore_app]
 'use strict';
 
+require('@google-cloud/debug-agent').start();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 var cors = require('cors');
