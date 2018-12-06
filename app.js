@@ -75,7 +75,7 @@ async function getPosts () {
 }
 
 async function getPostsByTag (tag) {
-	const query = datastore.createQuery('post').filter('tags', tag).order('created', { descending: true });
+	const query = datastore.createQuery('post').filter('tags', '=', tag).order('created', { descending: true });
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
