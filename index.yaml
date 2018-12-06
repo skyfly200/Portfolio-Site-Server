@@ -1,0 +1,4 @@
+- kind: post
+properties:
+  - name: tags
+  direction: desc
