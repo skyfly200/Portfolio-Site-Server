@@ -164,6 +164,7 @@ async function getTags() {
 async function addToTag(tag, post) {
 	const query = datastore.createQuery('tag').filter('tag', tag);
 	let tag_obj = await datastore.runQuery(query);
+	console.log(tag_obj);
 	let result = await datastore.save({
 		key: datastore.key(['tag', tag]),
 		data: (tag_obj[0] ? tag_obj[0][0] : {}),
@@ -234,8 +235,8 @@ app.post('/login', sendAuth);
 
 // Start Server
 
-const PORT = process.env.PORT || 8080;
-app.listen(process.env.PORT || 8080, () => {
+const PORT = process.env.PORT || 80;
+app.listen(process.env.PORT || 80, () => {
 	console.log(`App listening on port ${PORT}`);
 	console.log('Press Ctrl+C to quit.');
 });
