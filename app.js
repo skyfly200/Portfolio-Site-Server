@@ -166,7 +166,7 @@ async function addToTag(tag, post) {
 	let tag_obj = await datastore.runQuery(query);
 	let result = await datastore.save({
 		key: datastore.key(['tag', tag]),
-		data: (tag_obj[0] !== [] ? tag_obj[0][0].push(post) : [post]),
+		data: (tag_obj[0][0] !== [] ? tag_obj[0][0].push(post) : [post]),
 	});
 	return result;
 }
