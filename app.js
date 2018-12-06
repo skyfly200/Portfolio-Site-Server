@@ -16,6 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.json());
 
+app.options('*', cors())
+
 // By default, the client will authenticate using the service account file
 // specified by the GOOGLE_APPLICATION_CREDENTIALS environment variable and use
 // the project specified by the GOOGLE_CLOUD_PROJECT environment variable. See
@@ -27,7 +29,6 @@ const Datastore = require('@google-cloud/datastore');
 const datastore = Datastore();
 
 // Tag Functions
-
 async function tagLink (tag, post) {
 	const transaction = datastore.transaction();
 	transaction.run((err) => {
