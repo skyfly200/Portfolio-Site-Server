@@ -164,11 +164,12 @@ async function getTags() {
 async function addToTag(tag, post) {
 	const query = datastore.createQuery('tag').filter('tag', tag);
 	let tag_obj = await datastore.runQuery(query);
-	let result = await datastore.save({
+	if ()
+	let updated = (tag_obj[0][0] !== undefined ? tag_obj[0][0].push(post) : [post]);
+	return await datastore.save({
 		key: datastore.key(['tag', tag]),
-		data: (tag_obj[0][0] !== [] ? tag_obj[0][0].push(post) : [post]),
+		data: updated,
 	});
-	return result;
 }
 
 app.get('/tags', (req, res, next) => {
