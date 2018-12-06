@@ -29,34 +29,6 @@ const Datastore = require('@google-cloud/datastore');
 const datastore = Datastore();
 
 // Post Functions
-async function getPostsByTag (tag) {
-	const transaction = datastore.transaction();
-	transaction.run((err) => {
-	  if (err) {}
-		const query = datastore.createQuery('tag').filter('__key__', tag);
-	  query.run((err, entities) => {
-	    if (err) {}
-			const request = {
-			  projectId: '',
-			  keys: entities,
-			};
-			transaction.lookup(request)
-			  .then(responses => {
-			    const response = responses[0];
-			    return response;
-			  })
-			  .catch(err => {
-			    console.error(err);
-			  });
-	    transaction.commit((err) => {
-	      if (!err) {
-	        // Transaction committed successfully.
-	      }
-	    });
-	  });
-	});
-}
-
 async function savePost(req) {
 	// Create a new post record to be stored in the database
 	const post = {
@@ -97,9 +69,17 @@ async function getPost (id) {
 async function getPosts () {
 	const query = datastore.createQuery('post').order('created', { descending: true });
 	let results = await datastore.runQuery(query);
-    const entities = results[0];
-    if (entities) return entities;
-    return 0;
+  const entities = results[0];
+  if (entities) return entities;
+  return 0;
+}
+
+async function getPostsByTag (tag) {
+	const query = datastore.createQuery('post').filter('tags', tag).order('created', { descending: true });
+	let results = await datastore.runQuery(query);
+  const entities = results[0];
+  if (entities) return entities;
+  return 0;
 }
 
 app.get('/posts', (req, res, next) => {
