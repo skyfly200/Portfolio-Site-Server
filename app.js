@@ -44,7 +44,7 @@ async function savePost(req) {
 		key: datastore.key(['post', post.id]),
 		data: post,
 	});
-	for (let tag in post.tags) tagLink(tag, post.id);
+	for (let tag in post.tags) addToTag(tag, post.id);
 	return result;
 }
 
@@ -147,6 +147,39 @@ app.post('/submit', (req, res, next) => {
 	.catch( (error) => {
 		res.status(204).json(error);
 		console.log(error);
+		next();
+	});
+});
+
+// Tag Functions
+
+async function getTags() {
+	const query = datastore.createQuery('tag');
+	let result = await datastore.runQuery(query);
+	const entities = result[0];
+  if (entities) return entities[0];
+  return 0;
+}
+
+async function addToTag(tag, post) {
+	const query = datastore.createQuery('tag').filter('tag', tag);
+	let tag_obj = await datastore.runQuery(query);
+	let result = await datastore.save({
+		key: datastore.key(['tag', tag]),
+		data: (tag_obj[0] ? tag_obj[0][0] : {}),
+	});
+	return result;
+}
+
+app.get('/tags', (req, res, next) => {
+	getTags()
+	.then((posts) => {
+      res.status(200).json({posts});
+      next();
+    })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
 		next();
 	});
 });
