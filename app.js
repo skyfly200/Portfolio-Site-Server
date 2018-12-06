@@ -12,8 +12,8 @@ const config = require('./config');
 
 const app = express();
 app.enable('trust proxy');
-app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.json());
 
 // By default, the client will authenticate using the service account file
