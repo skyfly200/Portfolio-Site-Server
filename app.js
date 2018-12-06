@@ -28,24 +28,6 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
-// Tag Functions
-async function tagLink (tag, post) {
-	const transaction = datastore.transaction();
-	transaction.run((err) => {
-	  if (err) {}
-	  const key = datastore.key(['tag', tag.toLowerCase()]);
-	  transaction.get(key, (err, entity) => {
-	    if (err) {}
-			let update = entity ? entity : [];
-	    update.posts.push(post);
-	    transaction.save(entity);
-	    transaction.commit((err) => {
-	      if (!err) {}
-	    });
-	  });
-	});
-}
-
 // Post Functions
 async function getPostsByTag (tag) {
 	const transaction = datastore.transaction();
