@@ -1,3 +1,4 @@
+indexes:
 - kind: post
 properties:
   - name: tags
