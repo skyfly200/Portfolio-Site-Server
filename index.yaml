@@ -2,4 +2,5 @@ indexes:
 - kind: post
   properties:
   - name: tags
+  - name: created
     direction: desc
