@@ -1,4 +1,5 @@
+indexes:
 - kind: post
-properties:
+  properties:
   - name: tags
   direction: desc
