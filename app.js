@@ -9,6 +9,9 @@ var cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('./config');
+const user = require('./user');
+const tag = require('./tag');
+const post = require('./post');
 
 const app = express();
 app.enable('trust proxy');
@@ -44,7 +47,6 @@ async function savePost(req) {
 		key: datastore.key(['post', post.id]),
 		data: post,
 	});
-	for (let tag in post.tags) addToTag(tag, post.id);
 	return result;
 }
 
@@ -161,12 +163,29 @@ async function getTags() {
   return 0;
 }
 
-async function addToTag(tag, post) {
-	const query = datastore.createQuery('tag').filter('tag', tag);
+async function getTag(tag) {
+	const id = tag.toLowercase();
+	const query = datastore.createQuery('tag').filter('id', id);
+	let result = await datastore.runQuery(query);
+	const entities = result[0];
+  if (entities) return entities[0];
+  return 0;
+}
+
+async function saveTag(tag, increment) {
+	const id = tag.toLowercase();
+	const query = datastore.createQuery('tag').filter('id', id);
 	let tag_obj = await datastore.runQuery(query);
-	let updated = (tag_obj[0][0] !== undefined ? tag_obj[0][0].push(post) : [post]);
+	let updated = (tag_obj[0][0] !== undefined ? tag_obj[0][0] : {
+		id: id,
+		title: tag,
+		count: 0,
+		created: new Date()
+	});
+	// increment or decrement count
+	updated.count += ( increment ? 1 : -1 );
 	let result = await datastore.save({
-		key: datastore.key(['tag', tag]),
+		key: datastore.key(['tag', tag.id]),
 		data: updated,
 	});
 	return result;
