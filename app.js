@@ -47,6 +47,9 @@ async function savePost(req) {
 		key: datastore.key(['post', post.id]),
 		data: post,
 	});
+	for(tag in post.tags) {
+		saveTag(tags[tag], true);
+	}
 	return result;
 }
 
@@ -55,7 +58,10 @@ function deletePost (id) {
 		const key = datastore.key(['post', id]);
 		datastore.delete(key, (err, response) => {
 			if (err) reject(false);
-			else resolve(response);
+			else {
+				// decrement all post tags
+				resolve(response);
+			}
 		});
 	});
 }
@@ -65,7 +71,7 @@ async function getPost (id) {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
 
 async function getPosts () {
@@ -73,7 +79,7 @@ async function getPosts () {
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
-  return 0;
+  else return null;
 }
 
 async function getPostsByTag (tag) {
@@ -81,7 +87,7 @@ async function getPostsByTag (tag) {
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
-  return 0;
+  else return null;
 }
 
 app.get('/posts', (req, res, next) => {
@@ -160,8 +166,21 @@ async function getTags() {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
+
+app.get('/tags', (req, res, next) => {
+	getTags()
+	.then((tags) => {
+      res.status(200).json({tags});
+      next();
+    })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
+});
 
 async function getTag(tag) {
 	const id = tag.toLowercase();
@@ -169,8 +188,23 @@ async function getTag(tag) {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
+
+app.get('/tags/:id', (req, res, next) => {
+	if (req.params.id) {
+		getTag(req.params.id)
+		.then((tag) => {
+	      res.status(200).json({tag});
+	      next();
+	    })
+		.catch( (error) => {
+			res.status(204).json(error);
+			console.error(error);
+			next();
+		});
+	}
+});
 
 async function saveTag(tag, increment) {
 	const id = tag.toLowercase();
@@ -190,19 +224,6 @@ async function saveTag(tag, increment) {
 	});
 	return result;
 }
-
-app.get('/tags', (req, res, next) => {
-	getTags()
-	.then((posts) => {
-      res.status(200).json({posts});
-      next();
-    })
-	.catch( (error) => {
-		res.status(204).json(error);
-		console.error(error);
-		next();
-	});
-});
 
 // Auth Functions
 
@@ -247,7 +268,7 @@ async function getUser(email) {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
 
 app.post('/login', sendAuth);
