@@ -103,6 +103,7 @@ function uid () {
 		getPost(id)
 		.then((post) => {
 			if (post === {}) unique = true;
+			return
 	  })
 		.catch( (error) => {
 			console.error(error);
@@ -111,9 +112,9 @@ function uid () {
 }
 
 app.get('/posts/nonce', (req, res, next) => {
-	getPost(id)
-	.then((posts) => {
-    res.status(200).json({posts});
+	uid()
+	.then((id) => {
+    res.status(200).json({id});
     next();
   })
 	.catch( (error) => {
