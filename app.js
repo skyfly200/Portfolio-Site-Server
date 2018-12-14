@@ -47,9 +47,6 @@ async function savePost(req) {
 		key: datastore.key(['post', post.id]),
 		data: post,
 	});
-	for(tag in post.tags) {
-		saveTag(tags[tag], true);
-	}
 	return result;
 }
 
@@ -90,12 +87,48 @@ async function getPostsByTag (tag) {
   else return null;
 }
 
+function randomString (length) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for(var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+function uid () {
+	var unique = false;
+	while (!unique) {
+		var id = randomString(7);
+		getPost(id)
+		.then((post) => {
+			if (post === {}) unique = true;
+	  })
+		.catch( (error) => {
+			console.error(error);
+		});
+	}
+}
+
+app.get('/posts/nonce', (req, res, next) => {
+	getPost(id)
+	.then((posts) => {
+    res.status(200).json({posts});
+    next();
+  })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
+});
+
 app.get('/posts', (req, res, next) => {
 	getPosts()
 	.then((posts) => {
-      res.status(200).json({posts});
-      next();
-    })
+    res.status(200).json({posts});
+    next();
+  })
 	.catch( (error) => {
 		res.status(204).json(error);
 		console.error(error);
@@ -107,9 +140,9 @@ app.get('/posts/:tag', (req, res, next) => {
 	if (req.params.tag) {
 		getPostsByTag(req.params.tag)
 		.then((posts) => {
-	      res.status(200).json({posts});
-	      next();
-	    })
+      res.status(200).json({posts});
+      next();
+    })
 		.catch( (error) => {
 			res.status(204).json(error);
 			console.error(error);
@@ -122,9 +155,9 @@ app.get('/post/:id', (req, res, next) => {
 	if (req.params.id) {
 		getPost(req.params.id)
 		.then((post) => {
-	      res.status(200).json({post});
-	      next();
-	    })
+      res.status(200).json({post});
+      next();
+    })
 		.catch( (error) => {
 			res.status(204).json(error);
 			console.error(error);
@@ -136,9 +169,9 @@ app.get('/post/:id', (req, res, next) => {
 app.delete('/post/:id', (req, res, next) => {
 	deletePost(req.params.id)
 	.then((result) => {
-      res.status(200).json({result: result, id: req.params.id});
-      next();
-    })
+    res.status(200).json({result: result, id: req.params.id});
+    next();
+  })
 	.catch( (error) => {
 		res.status(204).json({error: error});
 		console.error(error);
@@ -150,7 +183,7 @@ app.post('/submit', (req, res, next) => {
 	savePost(req)
 	.then( (entry) => {
 		res.status(200).json(entry);
-  		next();
+  	next();
 	})
 	.catch( (error) => {
 		res.status(204).json(error);
@@ -172,9 +205,9 @@ async function getTags() {
 app.get('/tags', (req, res, next) => {
 	getTags()
 	.then((tags) => {
-      res.status(200).json({tags});
-      next();
-    })
+    res.status(200).json({tags});
+    next();
+  })
 	.catch( (error) => {
 		res.status(204).json(error);
 		console.error(error);
@@ -216,7 +249,7 @@ async function saveTag(tag, increment) {
 		count: 0,
 		created: new Date()
 	});
-	// increment or decrement count
+	// increment or decrement tag count
 	updated.count += ( increment ? 1 : -1 );
 	let result = await datastore.save({
 		key: datastore.key(['tag', tag.id]),
@@ -224,6 +257,19 @@ async function saveTag(tag, increment) {
 	});
 	return result;
 }
+
+app.post('/tags', (req, res, next) => {
+	saveTag(req.body.tag, req.body.increment)
+	.then( (entry) => {
+		res.status(200).json(entry);
+  	next();
+	})
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.log(error);
+		next();
+	});
+});
 
 // Auth Functions
 
