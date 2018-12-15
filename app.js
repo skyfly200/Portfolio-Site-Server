@@ -101,6 +101,7 @@ function uid () {
 		var unique = false;
 		while (!unique) {
 			var id = randomString(7);
+			console.log(id);
 			getPost(id)
 			.then((post) => {
 				if (post === {}) {
