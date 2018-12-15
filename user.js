@@ -34,8 +34,6 @@ function registerUser(req, res, next) {
 	});
 }
 
-router.post('/register', registerUser);
-
 function sendAuth(req, res, next) {
 	getUser(req.body.email)
 	.then( (user_obj) => {
@@ -59,7 +57,7 @@ async function getUser(email) {
   else return null;
 }
 
+router.post('/register', registerUser);
 router.post('/login', sendAuth);
-
 
 module.exports = router;
