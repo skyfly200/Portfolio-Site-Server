@@ -45,6 +45,7 @@ function deletePost (id) {
 					if (err) reject(false);
 					else {
 						// decrement all post tags
+						console.log(item);
 						for (var t in item.tags) tag.saveTag(t.title, false);
 						resolve(response);
 					}
