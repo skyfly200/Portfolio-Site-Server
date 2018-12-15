@@ -13,8 +13,8 @@ const post = require('./post');
 const app = express();
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 app.options('*', cors())
 
 app.use('/users', user);
@@ -22,7 +22,6 @@ app.use('/posts', post);
 app.use('/tags', tag);
 
 // Start Server
-
 const PORT = process.env.PORT || 80;
 app.listen(process.env.PORT || 80, () => {
 	console.log(`App listening on port ${PORT}`);

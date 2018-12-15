@@ -110,7 +110,7 @@ router.get('/uid', (req, res, next) => {
 	}
 });
 
-router.get('/posts', (req, res, next) => {
+router.get('/', (req, res, next) => {
 	getPosts()
 	.then((posts) => {
     res.status(200).json({posts});
@@ -123,7 +123,7 @@ router.get('/posts', (req, res, next) => {
 	});
 });
 
-router.get('/posts/:tag', (req, res, next) => {
+router.get('/:tag', (req, res, next) => {
 	if (req.params.tag) {
 		getPostsByTag(req.params.tag)
 		.then((posts) => {
