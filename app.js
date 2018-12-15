@@ -96,14 +96,14 @@ function randomString (length) {
     return text;
 }
 
-function uid () {
+function uid (callback) {
 		var id = randomString(7);
 		console.log(id);
 		getPost(id)
 		.then((post) => {
 			console.log(post);
-			if (post === {}) return id;
-			else return uid();
+			if (post === {}) callback(id);
+			else uid(callback);
 	  })
 		.catch( (error) => {
 			console.error(error);
