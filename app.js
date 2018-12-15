@@ -197,7 +197,7 @@ async function getTags() {
 	const query = datastore.createQuery('tag');
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
-  if (entities) return entities[0];
+  if (entities) return entities;
   else return null;
 }
 
