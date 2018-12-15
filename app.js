@@ -112,7 +112,7 @@ function uid () {
 				reject(error);
 			});
 		}
-	}
+	});
 }
 
 app.get('/uid', (req, res, next) => {
