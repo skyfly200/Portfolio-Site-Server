@@ -110,16 +110,16 @@ function uid (callback) {
 }
 
 app.get('/uid', (req, res, next) => {
-	uid()
-	.then((id) => {
-    res.status(200).json({id});
-    next();
-  })
-	.catch( (error) => {
-		res.status(204).json(error);
+	try {
+		uid((id) => {
+	    res.status(200).json({id});
+	    next();
+	  });
+	} catch(error)  {
+		res.status(500).json(error);
 		console.error(error);
 		next();
-	});
+	}
 });
 
 app.get('/posts', (req, res, next) => {
