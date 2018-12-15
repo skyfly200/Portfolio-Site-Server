@@ -111,7 +111,7 @@ function uid () {
 	}
 }
 
-app.get('/posts-nonce', (req, res, next) => {
+app.get('/uid', (req, res, next) => {
 	uid()
 	.then((id) => {
     res.status(200).json({id});
