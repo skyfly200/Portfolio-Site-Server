@@ -41,7 +41,12 @@ async function savePost(req) {
     title: req.body.title,
     body: req.body.body,
     tags: req.body.tags,
-		edits: req.body.edits
+		edits: req.body.edits,
+		published: req.body.published,
+		publishedVersion: req.body.publishedVersion,
+		canComment: req.body.canComment,
+		comments: req.body.comments,
+		archived: req.body.archived
 	};
   let result = await datastore.save({
 		key: datastore.key(['post', post.id]),
