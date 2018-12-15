@@ -53,12 +53,16 @@ async function savePost(req) {
 function deletePost (id) {
 	return new Promise( function(resolve, reject) {
 		const key = datastore.key(['post', id]);
-		datastore.delete(key, (err, response) => {
-			if (err) reject(false);
-			else {
-				// decrement all post tags
-				resolve(response);
-			}
+		getPost(id)
+		.then((post) => {
+			datastore.delete(key, (err, response) => {
+				if (err) reject(false);
+				else {
+					// decrement all post tags
+					for (tag in post.tags) saveTag(tag.title, false);
+					resolve(response);
+				}
+			});
 		});
 	});
 }
