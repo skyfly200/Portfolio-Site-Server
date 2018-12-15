@@ -235,11 +235,13 @@ app.get('/tags/:id', (req, res, next) => {
 			console.error(error);
 			next();
 		});
+	} else {
+		res.status(204).json({});
 	}
 });
 
 async function saveTag(tag, increment) {
-	const id = tag.toLowercase();
+	const id = tag.toString().toLowercase();
 	const query = datastore.createQuery('tag').filter('id', id);
 	let tag_obj = await datastore.runQuery(query);
 	let updated = (tag_obj[0][0] !== undefined ? tag_obj[0][0] : {
