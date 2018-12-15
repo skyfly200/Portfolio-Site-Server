@@ -101,8 +101,7 @@ function uid (callback) {
 	console.log(id);
 	getPost(id)
 	.then((post) => {
-		console.log(post);
-		if (post === {}) callback(id);
+		if (!post) callback(id);
 		else uid(callback);
   })
 	.catch( (error) => {
