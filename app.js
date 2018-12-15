@@ -97,17 +97,16 @@ function randomString (length) {
 }
 
 function uid (callback) {
-		var id = randomString(7);
-		console.log(id);
-		getPost(id)
-		.then((post) => {
-			console.log(post);
-			if (post === {}) callback(id);
-			else uid(callback);
-	  })
-		.catch( (error) => {
-			console.error(error);
-		});
+	var id = randomString(7);
+	console.log(id);
+	getPost(id)
+	.then((post) => {
+		console.log(post);
+		if (post === {}) callback(id);
+		else uid(callback);
+  })
+	.catch( (error) => {
+		console.error(error);
 	});
 }
 
