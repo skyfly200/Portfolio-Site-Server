@@ -253,7 +253,7 @@ async function saveTag(tag, increment) {
 	// increment or decrement tag count
 	updated.count += ( increment ? 1 : -1 );
 	let result = await datastore.save({
-		key: datastore.key(['tag', tag.id]),
+		key: datastore.key(['tag', id]),
 		data: updated,
 	});
 	return result;
@@ -262,7 +262,8 @@ async function saveTag(tag, increment) {
 app.post('/tags', (req, res, next) => {
 	saveTag(req.body.tag, req.body.increment)
 	.then( (entry) => {
-		res.status(200).json(entry);
+		if (entry[0]) res.status(200).json(entry[0]);
+		else res.status(204).json(null);
   	next();
 	})
 	.catch( (error) => {
