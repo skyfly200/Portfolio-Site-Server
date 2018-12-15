@@ -34,7 +34,7 @@ const datastore = Datastore();
 // Post Functions
 async function savePost(req) {
 	// Create a new post record to be stored in the database
-	const post = {
+	const post_obj = {
 		id: req.body.id,
 		created: req.body.created,
 		edited: req.body.edited,
@@ -49,8 +49,8 @@ async function savePost(req) {
 		archived: req.body.archived
 	};
   let result = await datastore.save({
-		key: datastore.key(['post', post.id]),
-		data: post,
+		key: datastore.key(['post', post_obj.id]),
+		data: post_obj,
 	});
 	return result;
 }
@@ -64,7 +64,7 @@ function deletePost (id) {
 					if (err) reject(false);
 					else {
 						// decrement all post tags
-						for (tag in item.tags) saveTag(tag.title, false);
+						for (t in item.tags) saveTag(t.title, false);
 						resolve(response);
 					}
 				});
@@ -88,8 +88,8 @@ async function getPosts () {
   else return null;
 }
 
-async function getPostsByTag (tag) {
-	const query = datastore.createQuery('post').filter('tags', '=', tag).order('created', { descending: true });
+async function getPostsByTag (tag_id) {
+	const query = datastore.createQuery('post').filter('tags', '=', tag_id).order('created', { descending: true });
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
@@ -307,12 +307,12 @@ app.post('/register', registerUser);
 
 function sendAuth(req, res, next) {
 	getUser(req.body.email)
-	.then( (user) => {
+	.then( (user_obj) => {
     if (!user) return res.status(404).send('No user found.');
     let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
     let token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 }); // Expires in 24 hours
-    res.status(200).send({ auth: true, token: token, user: user });
+    res.status(200).send({ auth: true, token: token, user: user_obj });
 		next();
   })
 	.catch( (err) => {
