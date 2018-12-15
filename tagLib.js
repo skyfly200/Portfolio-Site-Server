@@ -8,7 +8,7 @@ const Datastore = require('@google-cloud/datastore');
 // Instantiate a datastore client
 const datastore = Datastore();
 
-export.saveTag = async function(tag, increment) {
+exports.saveTag = async function(tag, increment) {
 	const id = tag.toLowerCase();
 	const query = datastore.createQuery('tag').filter('id', id);
 	let tag_obj = await datastore.runQuery(query);
@@ -27,7 +27,7 @@ export.saveTag = async function(tag, increment) {
 	return result;
 }
 
-export.getTag = async function(tag) {
+exports.getTag = async function(tag) {
 	const id = tag.toLowercase();
 	const query = datastore.createQuery('tag').filter('id', id);
 	let result = await datastore.runQuery(query);
@@ -36,7 +36,7 @@ export.getTag = async function(tag) {
   else return null;
 }
 
-export.getTags = async function() {
+exports.getTags = async function() {
 	const query = datastore.createQuery('tag');
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
