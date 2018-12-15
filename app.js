@@ -97,17 +97,21 @@ function randomString (length) {
 }
 
 function uid () {
-	var unique = false;
-	while (!unique) {
-		var id = randomString(7);
-		getPost(id)
-		.then((post) => {
-			if (post === {}) unique = true;
-			return id;
-	  })
-		.catch( (error) => {
-			console.error(error);
-		});
+	return new Promise(function(resolve, reject) {
+		var unique = false;
+		while (!unique) {
+			var id = randomString(7);
+			getPost(id)
+			.then((post) => {
+				if (post === {}) {
+					unique = true;
+					resolve(id);
+				}
+		  })
+			.catch( (error) => {
+				reject(error);
+			});
+		}
 	}
 }
 
