@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var tag = require('./tagLib');
+
 // By default, the client will authenticate using the service account file
 // specified by the GOOGLE_APPLICATION_CREDENTIALS environment variable and use
 // the project specified by the GOOGLE_CLOUD_PROJECT environment variable. See
@@ -43,7 +45,7 @@ function deletePost (id) {
 					if (err) reject(false);
 					else {
 						// decrement all post tags
-						for (var t in item.tags) saveTag(t.title, false);
+						for (var t in item.tags) tag.saveTag(t.title, false);
 						resolve(response);
 					}
 				});
