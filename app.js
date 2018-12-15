@@ -64,7 +64,7 @@ function deletePost (id) {
 					if (err) reject(false);
 					else {
 						// decrement all post tags
-						for (t in item.tags) saveTag(t.title, false);
+						for (var t in item.tags) saveTag(t.title, false);
 						resolve(response);
 					}
 				});
