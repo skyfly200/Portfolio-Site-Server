@@ -1,3 +1,7 @@
+var express = require('express')
+var router = express.Router()
+
+// User Functions and Routing
 
 function registerUser(req, res, next) {
 	datastore.insert({
@@ -18,14 +22,16 @@ function registerUser(req, res, next) {
 	});
 }
 
+router.post('/register', registerUser);
+
 function sendAuth(req, res, next) {
 	getUser(req.body.email)
-	.then( (user) => {
+	.then( (user_obj) => {
     if (!user) return res.status(404).send('No user found.');
     let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
     let token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 }); // Expires in 24 hours
-    res.status(200).send({ auth: true, token: token, user: user });
+    res.status(200).send({ auth: true, token: token, user: user_obj });
 		next();
   })
 	.catch( (err) => {
@@ -38,11 +44,10 @@ async function getUser(email) {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
 
-module.exports = {
-  registerUser: registerUser,
-  sendAuth: sendAuth,
-  getUser: getUser
-};
+router.post('/login', sendAuth);
+
+
+module.exports = router;

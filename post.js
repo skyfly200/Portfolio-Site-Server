@@ -1,18 +1,26 @@
-// Post Functions
+var express = require('express')
+var router = express.Router()
+
+// Post Functions and Routing
 async function savePost(req) {
 	// Create a new post record to be stored in the database
-	const post = {
+	const post_obj = {
 		id: req.body.id,
 		created: req.body.created,
 		edited: req.body.edited,
     title: req.body.title,
     body: req.body.body,
     tags: req.body.tags,
-		edits: req.body.edits
+		edits: req.body.edits,
+		published: req.body.published,
+		publishedVersion: req.body.publishedVersion,
+		canComment: req.body.canComment,
+		comments: req.body.comments,
+		archived: req.body.archived
 	};
   let result = await datastore.save({
-		key: datastore.key(['post', post.id]),
-		data: post,
+		key: datastore.key(['post', post_obj.id]),
+		data: post_obj,
 	});
 	return result;
 }
@@ -20,10 +28,17 @@ async function savePost(req) {
 function deletePost (id) {
 	return new Promise( function(resolve, reject) {
 		const key = datastore.key(['post', id]);
-		datastore.delete(key, (err, response) => {
-			if (err) reject(false);
-			else resolve(response);
-		});
+		getPost(id)
+			.then((item) => {
+				datastore.delete(key, (err, response) => {
+					if (err) reject(false);
+					else {
+						// decrement all post tags
+						for (var t in item.tags) saveTag(t.title, false);
+						resolve(response);
+					}
+				});
+			});
 	});
 }
 
@@ -32,7 +47,7 @@ async function getPost (id) {
 	let result = await datastore.runQuery(query);
 	const entities = result[0];
   if (entities) return entities[0];
-  return 0;
+  else return null;
 }
 
 async function getPosts () {
@@ -40,21 +55,119 @@ async function getPosts () {
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
-  return 0;
+  else return null;
 }
 
-async function getPostsByTag (tag) {
-	const query = datastore.createQuery('post').filter('tags', '=', tag).order('created', { descending: true });
+async function getPostsByTag (tag_id) {
+	const query = datastore.createQuery('post').filter('tags', '=', tag_id).order('created', { descending: true });
 	let results = await datastore.runQuery(query);
   const entities = results[0];
   if (entities) return entities;
-  return 0;
+  else return null;
 }
 
-module.exports = {
-  savePost: savePost,
-  deletePost: deletePost,
-  getPost: getPost,
-  getPosts: getPosts,
-  getPostsByTag: getPostsByTag
-};
+function randomString (length) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for(var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+function uid (callback) {
+	var id = randomString(7);
+	console.log(id);
+	getPost(id)
+	.then((post) => {
+		if (!post) callback(id);
+		else uid(callback);
+  })
+	.catch( (error) => {
+		console.error(error);
+	});
+}
+
+router.get('/uid', (req, res, next) => {
+	try {
+		uid((id) => {
+	    res.status(200).json({id});
+	    next();
+	  });
+	} catch(error)  {
+		res.status(500).json(error);
+		console.error(error);
+		next();
+	}
+});
+
+router.get('/posts', (req, res, next) => {
+	getPosts()
+	.then((posts) => {
+    res.status(200).json({posts});
+    next();
+  })
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.error(error);
+		next();
+	});
+});
+
+router.get('/posts/:tag', (req, res, next) => {
+	if (req.params.tag) {
+		getPostsByTag(req.params.tag)
+		.then((posts) => {
+      res.status(200).json({posts});
+      next();
+    })
+		.catch( (error) => {
+			res.status(204).json(error);
+			console.error(error);
+			next();
+		});
+	}
+});
+
+router.get('/post/:id', (req, res, next) => {
+	if (req.params.id) {
+		getPost(req.params.id)
+		.then((post) => {
+      res.status(200).json({post});
+      next();
+    })
+		.catch( (error) => {
+			res.status(204).json(error);
+			console.error(error);
+			next();
+		});
+	}
+});
+
+router.delete('/post/:id', (req, res, next) => {
+	deletePost(req.params.id)
+	.then((result) => {
+    res.status(200).json({result: result, id: req.params.id});
+    next();
+  })
+	.catch( (error) => {
+		res.status(204).json({error: error});
+		console.error(error);
+		next();
+	});
+});
+
+router.post('/submit', (req, res, next) => {
+	savePost(req)
+	.then( (entry) => {
+		res.status(200).json(entry);
+  	next();
+	})
+	.catch( (error) => {
+		res.status(204).json(error);
+		console.log(error);
+		next();
+	});
+});
+
+module.exports = router;
