@@ -103,7 +103,7 @@ function uid () {
 		getPost(id)
 		.then((post) => {
 			if (post === {}) unique = true;
-			return
+			return id;
 	  })
 		.catch( (error) => {
 			console.error(error);
