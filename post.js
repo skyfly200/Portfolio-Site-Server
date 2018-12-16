@@ -41,12 +41,13 @@ function deletePost (id) {
 		const key = datastore.key(['post', id]);
 		getPost(id)
 			.then((item) => {
+				var tags = item.tags;
 				datastore.delete(key, (err, response) => {
 					if (err) reject(false);
 					else {
 						// decrement all post tags
-						console.log(item.tags);
-						for (var t in item.tags) tag.saveTag(t.title, false);
+						console.log(tags);
+						for (var t in tags) tag.saveTag(t.title, false);
 						resolve(response);
 					}
 				});
