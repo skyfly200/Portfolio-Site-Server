@@ -9,7 +9,6 @@ const Datastore = require('@google-cloud/datastore');
 const datastore = Datastore();
 
 exports.saveTag = async function(tag, increment) {
-	console.log(tag);
 	const id = tag.toLowerCase();
 	const query = datastore.createQuery('tag').filter('id', id);
 	let tag_obj = await datastore.runQuery(query);
