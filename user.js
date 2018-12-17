@@ -51,11 +51,15 @@ function sendAuth(req, res, next) {
 }
 
 async function getUser(email) {
-	const query = datastore.createQuery('user').filter('email', email);
-	let result = await datastore.runQuery(query);
-	const entities = result[0];
-  if (entities) return entities[0];
-  else return null;
+	try {
+		const query = datastore.createQuery('user').filter('email', email);
+		let result = await datastore.runQuery(query);
+		const entities = result[0];
+	  if (entities) return entities[0];
+	  else return null;
+	} catch(error) {
+		throw error;
+	}
 }
 
 router.post('/register', registerUser);
