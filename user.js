@@ -45,7 +45,8 @@ function sendAuth(req, res, next) {
 		next();
   })
 	.catch( (err) => {
-		res.status(500).send({msg: "There was a problem getting user", err: err});
+		res.status(500).send("There was a problem getting user");
+		console.error(err);
 	});
 }
 
