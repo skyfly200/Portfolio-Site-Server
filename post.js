@@ -72,14 +72,6 @@ async function getPosts () {
   else return null;
 }
 
-async function getPostsByTag (tag_id) {
-	const query = datastore.createQuery('post').filter('tags', '=', tag_id).order('created', { descending: true });
-	let results = await datastore.runQuery(query);
-  const entities = results[0];
-  if (entities) return entities;
-  else return null;
-}
-
 function randomString (length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -126,21 +118,6 @@ router.get('/', (req, res, next) => {
 		console.error(error);
 		next();
 	});
-});
-
-router.get('/:tag', (req, res, next) => {
-	if (req.params.tag) {
-		getPostsByTag(req.params.tag)
-		.then((posts) => {
-      res.status(200).json({posts});
-      next();
-    })
-		.catch( (error) => {
-			res.status(204).json(error);
-			console.error(error);
-			next();
-		});
-	}
 });
 
 router.get('/post/:id', (req, res, next) => {
