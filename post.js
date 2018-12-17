@@ -47,7 +47,7 @@ function deletePost (id) {
 					else {
 						// decrement all post tags
 						for (var t in tags) {
-							tag.saveTag(t.title, false);
+							tag.saveTag(tags[t].title, false);
 							console.log(t);
 						}
 						resolve(response);
@@ -180,7 +180,7 @@ router.post('/submit', (req, res, next) => {
 	})
 	.catch( (error) => {
 		res.status(204).json(error);
-		console.log(error);
+		console.error(error);
 		next();
 	});
 });
