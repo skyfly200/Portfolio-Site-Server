@@ -36,7 +36,7 @@ function registerUser(req, res, next) {
 
 function sendAuth(req, res, next) {
 	getUser(req.body.email)
-	.then( (user_obj) => {
+	.then( (user) => {
     if (!user) return res.status(404).send('No user found.');
     let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
